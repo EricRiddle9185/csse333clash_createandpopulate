@@ -6,17 +6,17 @@ SET @data_path = (SELECT SUBSTRING(physical_name, 1, CHARINDEX(N'master.mdf', LO
                   WHERE database_id = 1 AND file_id = 1);
 --PRINT @data_path
 
-EXECUTE ('CREATE DATABASE riddleettest2
+EXECUTE ('CREATE DATABASE riddleettest3
 ON
 PRIMARY  
-    (NAME = riddleettest2,
-    FILENAME = '''+ @data_path + 'riddleettest2.mdf'',
+    (NAME = riddleettest3,
+    FILENAME = '''+ @data_path + 'riddleettest3.mdf'',
     SIZE = 10MB,
     MAXSIZE = 100MB,
     FILEGROWTH = 10%)
 LOG ON 
-   (NAME = riddleettest2log,
-    FILENAME = '''+ @data_path + 'riddleettest2log.ldf'',
+   (NAME = riddleettest3log,
+    FILENAME = '''+ @data_path + 'riddleettest3log.ldf'',
     SIZE = 10MB,
     MAXSIZE = 100MB,
     FILEGROWTH = 10%)'
@@ -156,7 +156,100 @@ CREATE TABLE CollectorLastCollected (
 
 
 -- sprocs
-/****** Object:  StoredProcedure [dbo].[AddResource]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[AddBuilding]    Script Date: 2/19/2026 6:35:04 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE   PROCEDURE [dbo].[AddBuilding] (
+	@username varchar(20),
+	@name varchar(20),
+	@level tinyint,
+	@buildTime int,
+	@maxHealth int,
+	@size int,
+	@goldCost int,
+	@elixirCost int,
+	@timestamp datetime,
+	@x int,
+	@y int,
+	@troopCapacity int,
+	@collectsGold int,
+	@collectsElixir int,
+	@damage int,
+	@attackRate int,
+	@damageType varchar(20),
+	@attacksMovementType varchar(20),
+	@goldStorage int,
+	@elixirStorage int
+)
+AS
+BEGIN
+	DECLARE @player int = (SELECT ID FROM Player WHERE UName = @username);
+	DECLARE @id int;
+	IF EXISTS (SELECT 1 FROM BuildingType WHERE Name = @name AND Level = @level)
+	BEGIN
+		SET @id = (SELECT ID FROM BuildingType WHERE Name = @name AND Level = @level);
+	END ELSE BEGIN
+		INSERT INTO BuildingType (Name, Level, BuildTime, MaxHealth, Size)
+		VALUES (@name, @level, @buildTime, @maxHealth, @size);
+		SET @id = SCOPE_IDENTITY();
+
+		DECLARE @goldId int = (SELECT ID FROM Resource WHERE Name = 'gold');
+		DECLARE @elixirId int = (SELECT ID FROM Resource WHERE Name = 'elixir');
+
+		INSERT INTO BuildingCosts (BuildingTypeID, ResourceID, Amount)
+		VALUES (@id, @goldId, @goldCost);
+		INSERT INTO BuildingCosts (BuildingTypeID, ResourceID, Amount)
+		VALUES (@id, @elixirId, @elixirCost);
+
+		IF NOT @troopCapacity IS NULL
+			INSERT INTO Camp (ID, Capacity)
+			VALUES (@id, @troopCapacity);
+		IF NOT @collectsGold IS NULL
+		BEGIN
+			INSERT INTO Collector (ID)
+			VALUES (@id);
+			INSERT INTO CollectorCollects (CollectorID, ResourceId, Amount)
+			VALUES (@id, @goldId, @collectsGold);
+		END
+		IF NOT @collectsElixir IS NULL
+		BEGIN
+			INSERT INTO Collector (ID)
+			VALUES (@id);
+			INSERT INTO CollectorCollects (CollectorID, ResourceId, Amount)
+			VALUES (@id, @elixirId, @collectsElixir);
+		END
+		IF NOT @damage IS NULL
+			INSERT INTO Defense (ID, Damage, AttackRate, DamageType, AttacksMovementType)
+			VALUES (@id, @damage, @attackRate, @damageType, @attacksMovementType)
+		IF NOT @goldStorage IS NULL
+		BEGIN
+			INSERT INTO Storage (ID)
+			VALUES (@id);
+			INSERT INTO StorageStores (StorageID, ResourceID, Amount)
+			VALUES (@id, @goldId, @goldStorage);
+		END
+		IF NOT @elixirStorage IS NULL
+		BEGIN
+			INSERT INTO Storage (ID)
+			VALUES (@id);
+			INSERT INTO StorageStores (StorageID, ResourceID, Amount)
+			VALUES (@id, @elixirId, @elixirStorage);
+		END
+
+		IF @level > 1
+		BEGIN
+			DECLARE @prevId int = (SELECT ID FROM BuildingType WHERE Name = @name AND Level = @level - 1);
+			INSERT INTO BuildingUpgrades (FromID, ToID)
+			VALUES (@prevId, @id);
+		END
+	END
+	INSERT INTO Building (CreationTime, PosX, PosY, BuildingTypeID, PlayerID)
+	VALUES (@timestamp, @x, @y, @id, @player);
+END
+GO
+/****** Object:  StoredProcedure [dbo].[AddResource]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -168,7 +261,7 @@ AS
 INSERT INTO Resource (Name)
 VALUES(@name)
 GO
-/****** Object:  StoredProcedure [dbo].[AddTroop]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[AddTroop]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -194,7 +287,7 @@ BEGIN
 		WHERE PlayerID = @player AND TroopTypeID = @troop;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[CanPlaceBuilding]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[CanPlaceBuilding]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -267,7 +360,7 @@ BEGIN
 	RETURN 1;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[CanUpgrade]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[CanUpgrade]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -326,7 +419,7 @@ CREATE   PROC [dbo].[CanUpgrade](
 	RETURN 1
 END
 GO
-/****** Object:  StoredProcedure [dbo].[CollectFromCollector]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[CollectFromCollector]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -387,7 +480,7 @@ CREATE PROC [dbo].[CollectFromCollector] (
 	WHERE BuildingID = @BuildingID
 END
 GO
-/****** Object:  StoredProcedure [dbo].[DeleteBuilding]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[DeleteBuilding]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -399,7 +492,7 @@ CREATE PROC [dbo].[DeleteBuilding] (
 	WHERE ID = @ID
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetBuildings]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetBuildings]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -423,7 +516,7 @@ JOIN BuildingType ON Building.buildingTypeId = BuildingType.id
 WHERE Building.PlayerID = @player
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetBuildingTypes]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetBuildingTypes]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -439,7 +532,7 @@ LEFT JOIN BuildingCosts AS GoldCost ON BuildingType.ID = GoldCost.BuildingTypeID
 LEFT JOIN BuildingCosts AS ElixirCost ON BuildingType.ID = ElixirCost.BuildingTypeID AND ElixirCost.ResourceID = 2
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetCamps]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetCamps]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -448,7 +541,7 @@ CREATE PROC [dbo].[GetCamps] AS BEGIN
 	SELECT * FROM Camp
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetCollectors]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetCollectors]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -460,7 +553,7 @@ CREATE   PROC [dbo].[GetCollectors] AS BEGIN
 	JOIN CollectorCollects e ON Collector.ID = e.CollectorID AND e.ResourceID = 2
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetCredentials]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetCredentials]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -471,7 +564,7 @@ CREATE   PROCEDURE [dbo].[GetCredentials]
 AS
 SELECT PasswordHash, PasswordSalt FROM Player WHERE UName = @Username;
 GO
-/****** Object:  StoredProcedure [dbo].[GetDefenses]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetDefenses]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -480,7 +573,7 @@ CREATE PROC [dbo].[GetDefenses] AS BEGIN
 	SELECT * FROM Defense
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetElixir]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetElixir]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -494,7 +587,7 @@ CREATE PROC [dbo].[GetElixir] (
 	WHERE PlayerID = @PlayerID AND Resource.Name = 'elixir'
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetGold]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetGold]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -508,7 +601,7 @@ CREATE PROC [dbo].[GetGold] (
 	WHERE PlayerID = @PlayerID AND Resource.Name = 'gold'
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetPlayerId]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetPlayerId]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -523,7 +616,7 @@ BEGIN
 	SELECT ID FROM Player WHERE UName = @Username;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetPlayers]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetPlayers]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -532,7 +625,7 @@ CREATE PROCEDURE [dbo].[GetPlayers]
 AS
 SELECT UName FROM Player;
 GO
-/****** Object:  StoredProcedure [dbo].[GetResource]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetResource]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -574,7 +667,7 @@ BEGIN
 		SELECT (@amount) AS AMOUNT
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetResourceCapacity]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetResourceCapacity]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -608,7 +701,7 @@ BEGIN
 	SELECT (@capacity) AS Capacity
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetStorages]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetStorages]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -620,7 +713,7 @@ CREATE   PROC [dbo].[GetStorages] AS BEGIN
 	JOIN StorageStores e ON Storage.ID = e.StorageID AND e.ResourceID = 2
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetTroopCapacity]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetTroopCapacity]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -643,7 +736,7 @@ BEGIN
 	SELECT (@capacity) AS Capacity
 END
 GO
-/****** Object:  StoredProcedure [dbo].[GetTroops]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[GetTroops]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -662,7 +755,68 @@ BEGIN
 	ORDER BY Name;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[PlaceBuilding]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[LoadResource]    Script Date: 2/19/2026 6:35:04 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[LoadResource] (
+	@username varchar(20),
+	@resource varchar(20),
+	@amount int
+)
+AS
+BEGIN
+	DECLARE @player int = (SELECT ID FROM Player WHERE UName = @username);
+	DECLARE @resourceId int = (SELECT ID FROM Resource WHERE Name = @resource);
+	INSERT INTO HasResource (PlayerID, ResourceID, Amount)
+	VALUES (@player, @resourceId, @amount);
+END
+GO
+/****** Object:  StoredProcedure [dbo].[LoadTroop]    Script Date: 2/19/2026 6:35:04 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE   PROCEDURE [dbo].[LoadTroop] (
+	@username varchar(20),
+	@name varchar(20),
+	@level tinyint,
+	@damage int,
+	@attackRate int,
+	@damageType varchar(20),
+	@size tinyint,
+	@movementType varchar(20),
+	@movementSpeed int,
+	@goldCost int,
+	@elixirCost int,
+	@amount int
+)
+AS
+BEGIN
+	DECLARE @player int = (SELECT ID FROM Player WHERE UName = @username);
+	DECLARE @id int;
+	IF EXISTS (SELECT 1 FROM TroopType WHERE Name = @name AND Level = @level)
+		SET @id = (SELECT ID FROM TroopType WHERE Name = @name AND Level = @level)
+	ELSE BEGIN
+		INSERT INTO TroopType (Name, Level, Damage, AttackRate, DamageType, Size, MovementType, MovementSpeed)
+		VALUES (@name, @level, @damage, @attackRate, @damageType, @size, @movementType, @movementSpeed);
+		SET @id = SCOPE_IDENTITY();
+
+		DECLARE @goldId int = (SELECT ID FROM Resource WHERE Name = 'gold');
+		DECLARE @elixirId int = (SELECT ID FROM Resource WHERE Name = 'elixir');
+
+		INSERT INTO TroopCosts (TroopID, ResourceID, Amount)
+		VALUES (@id, @goldId, @goldCost);
+		INSERT INTO TroopCosts (TroopID, ResourceID, Amount)
+		VALUES (@id, @elixirId, @elixirCost);
+	END
+
+	INSERT INTO HasTroop (PlayerId, TroopTypeID, Amount)
+	VALUES (@player, @id, @amount);
+END
+GO
+/****** Object:  StoredProcedure [dbo].[PlaceBuilding]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -728,7 +882,7 @@ BEGIN
 		VALUES(SCOPE_IDENTITY(), GETDATE())
 END
 GO
-/****** Object:  StoredProcedure [dbo].[RaiseTroopLevel]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[RaiseTroopLevel]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -797,7 +951,7 @@ BEGIN
 	WHERE PlayerID = @player AND ResourceId = @elixirID;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[Register]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[Register]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -821,7 +975,7 @@ BEGIN
 	VALUES (@Username, @PasswordHash, @PasswordSalt);
 END
 GO
-/****** Object:  StoredProcedure [dbo].[Upgrade]    Script Date: 2/19/2026 5:32:05 PM ******/
+/****** Object:  StoredProcedure [dbo].[Upgrade]    Script Date: 2/19/2026 6:35:04 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -890,3 +1044,4 @@ CREATE PROC [dbo].[Upgrade](
 	SET CreationTime = GETDATE()
 	WHERE Building.ID = @BuildingID
 END
+GO
