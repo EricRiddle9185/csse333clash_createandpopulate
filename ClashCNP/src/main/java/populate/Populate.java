@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -17,6 +20,18 @@ public class Populate {
 	public static void main(String[] args) {
 		String jsonString;
 		try {
+			final String SERVER = "golem.csse.rose-hulman.edu";
+			final String DB_NAME = "riddleetwagnernbdonovagd";
+			final String USERNAME = "Clashgui";
+			final String PASSWORD = "Password123";
+			final String URL = "jdbc:sqlserver://${dbServer};databaseName=${dbName};user=${user};password={${pass}};encrypt=false;";
+			String url = URL
+					.replace("${dbServer}", SERVER)
+					.replace("${dbName}", DB_NAME)
+					.replace("${user}", USERNAME)
+					.replace("${pass}", PASSWORD);
+            Connection conn = DriverManager.getConnection(url);
+			
 			// read json
 			jsonString = new String(Files.readAllBytes(Paths.get("src/main/java/populate/data.json")));
 			JsonObject jsonObject = (JsonObject) Jsoner.deserialize(jsonString);
@@ -92,7 +107,7 @@ public class Populate {
 					int amount = ((BigDecimal) troop.get("amount")).intValue();
 				}
 			}
-		} catch (IOException | JsonException e) {
+		} catch (IOException | SQLException | JsonException e) {
 			e.printStackTrace();
 		}
 	}
