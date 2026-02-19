@@ -3,4 +3,20 @@
   <groupId>asdf</groupId>
   <artifactId>ClashCNP</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <build>
+  	<plugins>
+  		<plugin>
+  			<groupId>asdf</groupId>
+  			<artifactId>ClashCNP</artifactId>
+  		</plugin>
+  	</plugins>
+  </build>
+  <dependencies>
+	<!-- https://mvnrepository.com/artifact/com.github.cliftonlabs/json-simple -->
+	<dependency>
+		<groupId>com.github.cliftonlabs</groupId>
+		<artifactId>json-simple</artifactId>
+		<version>4.0.1</version>
+	</dependency>
+  </dependencies>
 </project>
