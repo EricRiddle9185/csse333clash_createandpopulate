@@ -2,6 +2,7 @@
   "players": [
     {
       "username": "user1",
+	  "password": "pass1",
       "gold": 1000,
       "elixir": 500,
       "buildings": [
@@ -219,36 +220,46 @@
           "name": "Barbarian",
           "level": 1,
           "damage": 10,
+          "damage type": "single",
           "attack rate": 2,
           "size": 1,
           "movement type": "Ground",
           "movement speed": 1,
+          "gold cost": 2500,
+          "elixir cost": 0,
           "amount": 5
         },
         {
           "name": "Archer",
           "level": 1,
           "damage": 10,
+          "damage type": "single",
           "attack rate": 2,
           "size": 1,
           "movement type": "Ground",
           "movement speed": 1,
+          "gold cost": 2500,
+          "elixir cost": 0,
           "amount": 10
         },
         {
           "name": "Giant",
           "level": 1,
           "damage": 30,
+          "damage type": "single",
           "attack rate": 1,
           "size": 3,
           "movement type": "Ground",
           "movement speed": 1,
+          "gold cost": 2500,
+          "elixir cost": 0,
           "amount": 1
         }
       ]
     },
     {
       "username": "user2",
+	  "password": "pass2",
       "gold": 250,
       "elixir": 300,
       "buildings": [
@@ -383,16 +394,20 @@
           "name": "Barbarian",
           "level": 1,
           "damage": 10,
+          "damage type": "single",
           "attack rate": 2,
           "size": 1,
           "movement type": "Ground",
           "movement speed": 1,
+          "gold cost": 2500,
+          "elixir cost": 0,
           "amount": 9
 		}
       ]
     },
     {
       "username": "user3",
+	  "password": "pass3",
       "gold": 0,
       "elixir": 0,
       "buildings": [
@@ -419,10 +434,13 @@
           "name": "Barbarian",
           "level": 1,
           "damage": 10,
+          "damage type": "single",
           "attack rate": 2,
           "size": 1,
           "movement type": "Ground",
           "movement speed": 1,
+          "gold cost": 2500,
+          "elixir cost": 0,
           "amount": 1
 		}
       ]

@@ -21,7 +21,11 @@ LOG ON
     MAXSIZE = 100MB,
     FILEGROWTH = 10%)'
 );
+CREATE USER Clashgui FROM LOGIN Clashgui; 
 
+exec sp_addrolemember 'db_owner', 'Clashgui'; 
+
+GO
 
 
 
