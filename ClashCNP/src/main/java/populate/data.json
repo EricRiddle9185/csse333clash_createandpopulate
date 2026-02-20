@@ -246,6 +246,186 @@
           "amount": 1
         }
       ]
+    },
+    {
+      "username": "user2",
+      "gold": 250,
+      "elixir": 300,
+      "buildings": [
+        {
+          "name": "Cannon",
+          "level": 1,
+          "build time": 10,
+          "max health": 100,
+          "size": 1,
+          "type": "defense",
+          "damage": 10,
+          "attack rate": 10,
+          "damage type": "Single",
+          "attacks movement type": "Ground",
+          "gold cost": 100,
+          "elixir cost": 0,
+          "creation time": "2026-01-01T12:34:56",
+          "pos x": 1,
+          "pos y": 1
+        },
+        {
+          "name": "Cannon",
+          "level": 1,
+          "build time": 10,
+          "max health": 100,
+          "size": 1,
+          "type": "defense",
+          "damage": 10,
+          "attack rate": 10,
+          "damage type": "Single",
+          "attacks movement type": "Ground",
+          "gold cost": 100,
+          "elixir cost": 0,
+          "creation time": "2026-01-01T12:34:56",
+          "pos x": 3,
+          "pos y": 1
+        },
+        {
+          "name": "Cannon",
+          "level": 1,
+          "build time": 10,
+          "max health": 100,
+          "size": 1,
+          "type": "defense",
+          "damage": 10,
+          "attack rate": 10,
+          "damage type": "Single",
+          "attacks movement type": "Ground",
+          "gold cost": 100,
+          "elixir cost": 0,
+          "creation time": "2026-01-01T12:34:56",
+          "pos x": 5,
+          "pos y": 1
+        },
+        {
+          "name": "Gold Storage",
+          "level": 1,
+          "build time": 30,
+          "max health": 100,
+          "size": 2,
+          "type": "storage",
+          "stores gold": 1000,
+          "stores elixir": 0,
+          "gold cost": 0,
+          "elixir cost": 100,
+          "creation time": "2026-01-01T12:34:56",
+          "pos x": 1,
+          "pos y": 2
+        },
+        {
+          "name": "Gold Storage",
+          "level": 1,
+          "build time": 30,
+          "max health": 100,
+          "size": 2,
+          "type": "storage",
+          "stores gold": 1000,
+          "stores elixir": 0,
+          "gold cost": 0,
+          "elixir cost": 100,
+          "creation time": "2026-01-01T12:34:56",
+          "pos x": 3,
+          "pos y": 2
+        },
+        {
+          "name": "Elixir Storage",
+          "level": 1,
+          "build time": 30,
+          "max health": 100,
+          "size": 2,
+          "type": "storage",
+          "stores gold": 0,
+          "stores elixir": 1000,
+          "gold cost": 100,
+          "elixir cost": 0,
+          "creation time": "2026-01-01T12:34:56",
+          "pos x": 7,
+          "pos y": 2
+        },
+        {
+          "name": "Elixir Storage",
+          "level": 1,
+          "build time": 30,
+          "max health": 100,
+          "size": 2,
+          "type": "storage",
+          "stores gold": 0,
+          "stores elixir": 1000,
+          "gold cost": 100,
+          "elixir cost": 0,
+          "creation time": "2026-01-01T12:34:56",
+          "pos x": 5,
+          "pos y": 2
+        },
+        {
+          "name": "Army Camp",
+          "level": 1,
+          "build time": 180,
+          "max health": 100,
+          "size": 3,
+          "type": "camp",
+          "capacity": 10,
+          "gold cost": 0,
+          "elixir cost": 500,
+          "creation time": "2026-01-01T12:34:56",
+          "pos x": 3,
+          "pos y": 7
+        }
+      ],
+      "troops": [
+        {
+          "name": "Barbarian",
+          "level": 1,
+          "damage": 10,
+          "attack rate": 2,
+          "size": 1,
+          "movement type": "Ground",
+          "movement speed": 1,
+          "amount": 9
+		}
+      ]
+    },
+    {
+      "username": "user3",
+      "gold": 0,
+      "elixir": 0,
+      "buildings": [
+        {
+          "name": "Cannon",
+          "level": 1,
+          "build time": 10,
+          "max health": 100,
+          "size": 1,
+          "type": "defense",
+          "damage": 10,
+          "attack rate": 10,
+          "damage type": "Single",
+          "attacks movement type": "Ground",
+          "gold cost": 100,
+          "elixir cost": 0,
+          "creation time": "2026-01-01T12:34:56",
+          "pos x": 10,
+          "pos y": 10
+        }
+      ],
+      "troops": [
+        {
+          "name": "Barbarian",
+          "level": 1,
+          "damage": 10,
+          "attack rate": 2,
+          "size": 1,
+          "movement type": "Ground",
+          "movement speed": 1,
+          "amount": 1
+		}
+      ]
     }
   ]
 }
